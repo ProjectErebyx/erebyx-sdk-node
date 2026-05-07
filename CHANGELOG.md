@@ -10,6 +10,23 @@ The underlying Rust crate is [`erebyx-sdk`](https://github.com/ProjectErebyx/ere
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- **License: Apache-2.0 → MIT** per locked canon 2026-05-07 (Anthropic + Stripe + Cohere SDK convention; npm ecosystem norm). `LICENSE` content replaced with canonical MIT text. `package.json` license field updated. README + CONTRIBUTING updated. Source-of-truth: `erebyx-monorepo/docs/distribution/license-canon/README.md` §4.2.
+
+### Removed
+
+- `NOTICE` file removed (MIT does not require attribution file; was Apache-2.0 holdover).
+
+### Added
+
+- `.github/pull_request_template.md` — carve-out PR template with zero-substrate-logic checklist (load-bearing patent defense per Lock 12+28+42).
+- `.github/workflows/dco-check.yml` — DCO sign-off enforcement workflow.
+
+---
+
 ## [0.1.1] — 2026-04-27 — Genesis Arche
 
 First public release. Native Node.js client over the EREBYX v0.1.1 cognitive surface, built on `erebyx-sdk` (Rust) via napi-rs.

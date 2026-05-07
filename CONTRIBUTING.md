@@ -2,7 +2,7 @@
 
 Thanks for your interest. The Node SDK is a thin napi-rs binding over the Rust [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk) crate — pull requests for ergonomic JS/TS APIs, type definitions, and platform compatibility are welcome.
 
-By contributing, you agree your contributions are licensed under [Apache-2.0](LICENSE).
+By contributing, you agree your contributions are licensed under [MIT](LICENSE).
 
 ---
 
