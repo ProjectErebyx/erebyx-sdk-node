@@ -1,0 +1,28 @@
+[package]
+name = "erebyx-sdk-node"
+version = "0.1.1"
+edition = "2021"
+rust-version = "1.77"
+description = "Native Node.js bindings for Erebyx memory SDK (via napi-rs)"
+license = "Apache-2.0"
+# Block accidental crates.io publish — this is a napi-rs internal crate.
+# The npm package (@erebyx/sdk) is the public surface; it's gated by package.json "private": true.
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+erebyx-sdk = { path = "../erebyx-sdk" }
+napi = { version = "2", features = ["async", "tokio_rt"] }
+napi-derive = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread"] }
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true
+strip = true

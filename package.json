@@ -1,0 +1,75 @@
+{
+  "name": "@erebyx/sdk",
+  "version": "0.1.1",
+  "description": "Persistent AI memory across every AI you use. Native Node.js SDK for Erebyx via napi-rs. Encrypted in transit and at rest server-side; client-side end-to-end encryption ships in v0.1.x.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./errors": {
+      "types": "./errors.d.ts",
+      "default": "./errors.js"
+    },
+    "./types": {
+      "types": "./types.d.ts"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "errors.js",
+    "errors.d.ts",
+    "types.d.ts",
+    "*.node",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "_comment": "private: true blocks accidental npm publish until launch moment. Set to false (or remove) when ready to flip public.",
+  "private": true,
+  "license": "Apache-2.0",
+  "homepage": "https://erebyx.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ProjectErebyx/erebyx-sdk-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ProjectErebyx/erebyx-sdk-node/issues",
+    "email": "support@erebyx.com"
+  },
+  "keywords": [
+    "mcp",
+    "ai",
+    "memory",
+    "claude",
+    "erebyx",
+    "sdk",
+    "napi-rs"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "napi": {
+    "name": "erebyx-sdk",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "aarch64-apple-darwin",
+        "x86_64-apple-darwin",
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-pc-windows-msvc"
+      ]
+    }
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0"
+  },
+  "scripts": {
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform"
+  }
+}

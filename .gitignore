@@ -1,0 +1,33 @@
+# Build (Rust)
+/target
+
+# Build (Node)
+/dist
+/node_modules
+*.node
+index.js
+index.d.ts
+
+# Native binary artifacts
+*.dylib
+*.so
+*.dll
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Logs
+*.log
+logs/
+outputs/
+
+# napi-rs build output
+napi-build-error.log
