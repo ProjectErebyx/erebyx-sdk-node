@@ -100,7 +100,14 @@ impl Memory {
     /// Create a new Memory client.
     ///
     /// @param apiKey - Your Erebyx API key (erebyx_...)
-    /// @param options - Optional configuration { apiUrl, instanceId }
+    /// @param options - Optional configuration `{ apiUrl, instanceId, passphrase }`.
+    ///   - `passphrase` is REQUIRED for Genesis Arche tenants registered at
+    ///     v0.1.1+ (Argon2id-default-on, Lock #20 2026-05-18). The substrate
+    ///     hashes it with the tenant's stored Argon2id parameters at request
+    ///     time to derive the KEK that decrypts the tenant data envelope.
+    ///     **The server never persists it.** Lose the passphrase AND the
+    ///     BIP39 recovery seed → data is unrecoverable by design.
+    ///   - Omit for legacy `hkdf_api_key` tenants registered before v0.1.1.
     #[napi(constructor)]
     pub fn new(api_key: String, options: Option<JsMemoryOptions>) -> Result<Self> {
         let opts = options.unwrap_or_default();
@@ -112,6 +119,13 @@ impl Memory {
         if let Some(id) = &opts.instance_id {
             builder = builder.instance_id(id);
         }
+        // Argon2id-default-on (Lock #20, 2026-05-18). The Rust builder
+        // silently drops empty/whitespace input, so passing through is
+        // safe: the SDK boundary distinguishes "header absent" (legacy
+        // hkdf_api_key tenant) from "header empty" (substrate rejects).
+        if let Some(p) = &opts.passphrase {
+            builder = builder.passphrase(p);
+        }
 
         let inner = builder.build().map_err(sdk_error_to_napi)?;
 
@@ -120,7 +134,9 @@ impl Memory {
 
     /// Create a Memory client from environment variables.
     ///
-    /// Reads EREBYX_API_KEY, EREBYX_API_URL, EREBYX_INSTANCE_ID.
+    /// Reads `EREBYX_API_KEY`, `EREBYX_API_URL`, `EREBYX_INSTANCE_ID`,
+    /// and `EREBYX_PASSPHRASE` (required for Argon2id-default-on tenants
+    /// registered at v0.1.1+; empty/missing for legacy `hkdf_api_key`).
     #[napi(factory)]
     pub fn from_env() -> Result<Self> {
         let inner = RustMemory::from_env().map_err(sdk_error_to_napi)?;
@@ -337,6 +353,12 @@ impl Memory {
 pub struct JsMemoryOptions {
     pub api_url: Option<String>,
     pub instance_id: Option<String>,
+    /// Per-tenant passphrase for Argon2id-default-on Genesis Arche
+    /// tenants (Lock #20, 2026-05-18). Required at v0.1.1+ for any
+    /// tenant registered with `encryption_mode: argon2_passphrase`.
+    /// Omit for legacy `hkdf_api_key` tenants — the substrate
+    /// distinguishes header-absent (legacy) from header-empty (reject).
+    pub passphrase: Option<String>,
 }
 
 #[napi(object)]
