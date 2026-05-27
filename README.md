@@ -40,7 +40,7 @@ It exposes the v0.1.1 cognitive surface as five async methods:
 | `search(query, opts)` | Find what you know by meaning (the `remember` verb) |
 | `wrapUp(whatWeBuilt, whatsNext, opts)` | Create a session handoff at the end |
 
-Substrate behavior (atomization, retrieval, dream cycle, encryption) lives behind the API — you never need to think about it.
+All processing — memory understanding, recall, organization, encryption — lives behind the API — you never need to think about it.
 
 ---
 

@@ -47,7 +47,7 @@ None. First public release.
 
 ### Deferred to v0.1.2 / v0.2
 
-- `evolve` — memory reconsolidation
+- `evolve` — update a memory with new context
 - `learn` — explicit relationship formation
 - `import` — bulk import from ChatGPT / Claude / Markdown exports
 - `pin` / `release` — explicit memory tier control
