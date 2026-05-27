@@ -27,7 +27,11 @@ yarn add @erebyx/sdk
 ## 2. Configure (10 seconds)
 
 ```bash
-export EREBYX_API_KEY="erebyx_..."
+export EREBYX_API_KEY="<YOUR_API_KEY>"
+
+# Required for tenants registered at v0.1.1+ (Argon2id-default-on).
+# Pull this from your dashboard's recovery panel at registration time.
+export EREBYX_PASSPHRASE="<YOUR_PASSPHRASE>"
 ```
 
 Optional overrides (rarely needed):
@@ -161,6 +165,7 @@ Use this if your service handles its own session warm-up. Most users want auto-f
 | Error | Cause | Fix |
 |---|---|---|
 | `code: 'AUTH'` | API key missing or wrong | Check `process.env.EREBYX_API_KEY` is set and starts with `erebyx_` |
+| `code: 'AUTH'` with `passphrase_required` server message | `EREBYX_PASSPHRASE` not set for an Argon2id-default-on tenant | Set `process.env.EREBYX_PASSPHRASE` to the value from the dashboard recovery panel |
 | `code: 'NETWORK'` | Connectivity / DNS / TLS | Verify `https://core.erebyx.com` is reachable from the host |
 | `code: 'CIRCUIT_OPEN'` | 3 consecutive failures within 30s | SDK is backing off; retries automatically. Check substrate health. |
 | `code: 'SERVER'`, `status: 404` | Substrate version mismatch | Verify substrate is `v0.1.1+` |
