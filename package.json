@@ -71,6 +71,13 @@
   "devDependencies": {
     "@napi-rs/cli": "^2.18.0"
   },
+  "optionalDependencies": {
+    "@erebyx/sdk-darwin-x64": "0.1.1",
+    "@erebyx/sdk-darwin-arm64": "0.1.1",
+    "@erebyx/sdk-linux-x64-gnu": "0.1.1",
+    "@erebyx/sdk-linux-arm64-gnu": "0.1.1",
+    "@erebyx/sdk-win32-x64-msvc": "0.1.1"
+  },
   "scripts": {
     "build": "napi build --platform --release",
     "build:debug": "napi build --platform",
