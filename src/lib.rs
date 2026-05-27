@@ -493,10 +493,12 @@ pub struct JsSaveResult {
     /// a fresh `(instance_id, session_id)` tuple. Empty thereafter.
     pub auto_fired: Vec<String>,
     /// Forward-compat catch-all for `StoreMemoryResponse` fields not
-    /// typed individually (`action`, `dedup`, `atomization`,
+    /// typed individually (`action`, `dedup`, `enrichment`,
     /// `created_at`, `warnings`, `schema_version`,
-    /// `consolidation_priority`, `content_hash`). P0-A fix from
-    /// POSTFIX_SDK_NODE.
+    /// `consolidation_priority`, `content_hash`). The `enrichment`
+    /// field replaced the legacy substrate-internal `atomization`
+    /// envelope at the API boundary per Genesis Arche brand canon —
+    /// same shape `{queued, queue_id}`, customer-facing key name.
     pub extra: serde_json::Value,
 }
 
@@ -667,10 +669,13 @@ pub struct JsRestoreIdentityResult {
 #[derive(Default)]
 pub struct JsLoadContextOptions {
     pub anchors: Option<Vec<String>>,
-    pub mode: Option<String>,
-    /// When `mode === "specialization"`, the name of the specialization
-    /// to load by exact match.
-    pub specialization_name: Option<String>,
+    // SIMPLIFY-MODES (Genesis Arche T-5 days, 2026-05-27): the
+    // ``mode`` + ``specialization_name`` fields were dropped to match
+    // the substrate's MCP launch surface narrowing (PR #963).
+    // ``mode`` was a single-value enum (``"session"``) at v0.1;
+    // specialization-loading is a v0.2 feature. The substrate still
+    // accepts these fields on the wire if forwarded, but they're not
+    // part of the customer-facing SDK surface for v0.1.
     pub detail_level: Option<String>,
     /// Token-budget priority: `"minimal"` | `"summary"` | `"full"`.
     pub load_priority: Option<String>,
