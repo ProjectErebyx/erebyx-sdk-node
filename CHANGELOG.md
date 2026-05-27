@@ -18,7 +18,7 @@ First public release. Native Node.js client over the EREBYX v0.1.1 cognitive sur
 
 - **5 cognitive verbs** as async methods: `restoreIdentity()`, `loadContext()`, `save()`, `search()`, `wrapUp()`
 - **TypeScript-first API** — full `index.d.ts` with named types for every request / response
-- **`Memory.fromEnv()`** — reads `EREBYX_API_KEY`, `EREBYX_API_URL`, `EREBYX_INSTANCE_ID`
+- **`Memory.fromEnv()`** — reads `EREBYX_API_KEY`, `EREBYX_PASSPHRASE` (required for v0.1.1+ Argon2id-default-on tenants), `EREBYX_API_URL`, `EREBYX_INSTANCE_ID`
 - **Constructor**: `new Memory(apiKey, { apiUrl, instanceId })` for explicit construction
 - **Circuit breaker** — 3-failure threshold, 30s open window, half-open retry. Inherited from the Rust SDK; surfaced as `code: 'CIRCUIT_OPEN'` JS errors.
 - **Typed errors** — `code: 'AUTH'`, `code: 'NETWORK'`, `code: 'CIRCUIT_OPEN'`, `code: 'SERVER'`
@@ -30,6 +30,7 @@ First public release. Native Node.js client over the EREBYX v0.1.1 cognitive sur
 ### Configuration
 
 - `EREBYX_API_KEY` (required)
+- `EREBYX_PASSPHRASE` (required for tenants registered at v0.1.1+ — Argon2id-default-on; surfaced in the dashboard recovery panel)
 - `EREBYX_API_URL` (default: `https://core.erebyx.com`)
 - `EREBYX_INSTANCE_ID` (default: `default`)
 - `EREBYX_HINTS_DISABLED=1` — opt out of `X-Erebyx-Hint` parsing
