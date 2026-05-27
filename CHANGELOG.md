@@ -4,9 +4,7 @@ All notable changes to `@erebyx/sdk` (Node.js) are documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
 
-The substrate-side release notes live at [erebyx-os `CHANGELOG_v0_1_1.md`](https://github.com/ProjectErebyx/erebyx-os/blob/main/CHANGELOG_v0_1_1.md).
-
-The underlying Rust crate is [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk/blob/main/CHANGELOG.md).
+The underlying Rust crate is [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk/blob/main/CHANGELOG.md). Substrate-side (private engine) release notes are summarized in each SDK release entry below.
 
 ---
 
