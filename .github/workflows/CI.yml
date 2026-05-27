@@ -1,0 +1,212 @@
+# Per-arch prebuilt binary CI matrix for the napi-rs Node.js SDK.
+#
+# Build matrix mirrors the `napi.triples` block in package.json:
+#   - x86_64-apple-darwin       (macOS Intel)
+#   - aarch64-apple-darwin      (macOS Apple Silicon)
+#   - x86_64-unknown-linux-gnu  (Linux x64)
+#   - aarch64-unknown-linux-gnu (Linux ARM64)
+#   - x86_64-pc-windows-msvc    (Windows x64)
+#
+# Each runner produces a `.node` binary; the publish job downloads
+# every artifact, runs `napi prepublish` to assemble per-triple
+# subpackages (@erebyx/sdk-darwin-x64, etc.) declared as
+# optionalDependencies of the parent @erebyx/sdk, and publishes.
+#
+# Publish is gated on `workflow_dispatch` AND a `release: published`
+# event so an accidental tag push can't ship to npm without operator
+# intent. Per Mikey's launch doctrine: manual testing of distribution
+# must precede any publish flip.
+#
+# Cross-repo dependency:
+#   This crate's Cargo.toml declares `erebyx-sdk = { path = "../erebyx-sdk" }`.
+#   CI checks out ProjectErebyx/EREBYX-SDK as a sibling so the path-dep
+#   resolves. Requires repo secret `SDK_REPO_TOKEN` — a fine-grained PAT
+#   with read access to the EREBYX-SDK repo.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        working-directory: erebyx-sdk-node
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-apple-darwin
+            runner: macos-13
+            build: napi build --platform --release --target x86_64-apple-darwin
+          - target: aarch64-apple-darwin
+            runner: macos-14
+            build: napi build --platform --release --target aarch64-apple-darwin
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+            build: napi build --platform --release --target x86_64-unknown-linux-gnu
+          - target: aarch64-unknown-linux-gnu
+            runner: ubuntu-latest
+            build: |
+              rustup target add aarch64-unknown-linux-gnu
+              sudo apt-get update
+              sudo apt-get install -y gcc-aarch64-linux-gnu
+              napi build --platform --release --target aarch64-unknown-linux-gnu
+            cargo_config: |
+              [target.aarch64-unknown-linux-gnu]
+              linker = "aarch64-linux-gnu-gcc"
+          - target: x86_64-pc-windows-msvc
+            runner: windows-latest
+            build: napi build --platform --release --target x86_64-pc-windows-msvc
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          path: erebyx-sdk-node
+
+      - name: Checkout sibling erebyx-sdk crate
+        uses: actions/checkout@v4
+        with:
+          repository: ProjectErebyx/EREBYX-SDK
+          path: erebyx-sdk
+          token: ${{ secrets.SDK_REPO_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: erebyx-sdk-node/package-lock.json
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+
+      - name: Configure cross-link (Linux ARM64 only)
+        if: matrix.cargo_config != ''
+        shell: bash
+        run: |
+          mkdir -p .cargo
+          printf '%s\n' "${{ matrix.cargo_config }}" >> .cargo/config.toml
+
+      - name: Install dependencies
+        shell: bash
+        run: npm ci || npm install
+
+      - name: Build
+        shell: bash
+        run: ${{ matrix.build }}
+
+      - name: Smoke-test build artifact
+        if: matrix.target != 'aarch64-unknown-linux-gnu' && matrix.target != 'aarch64-apple-darwin'
+        shell: bash
+        run: |
+          # Only test on the same arch we built for — aarch64 cross-builds
+          # can't execute the produced .node on x86_64 runners.
+          node -e "const sdk = require('./index.js'); console.log('Loaded:', Object.keys(sdk).sort().join(', '))"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bindings-${{ matrix.target }}
+          path: erebyx-sdk-node/*.node
+          if-no-files-found: error
+
+  rust-test:
+    name: Rust smoke check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: erebyx-sdk-node
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          path: erebyx-sdk-node
+
+      - name: Checkout sibling erebyx-sdk crate
+        uses: actions/checkout@v4
+        with:
+          repository: ProjectErebyx/EREBYX-SDK
+          path: erebyx-sdk
+          token: ${{ secrets.SDK_REPO_TOKEN }}
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: cargo fmt (this crate only)
+        run: cargo fmt -p erebyx-sdk-node --check
+
+      - name: cargo check
+        run: cargo check --all-targets
+
+      - name: cargo clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    needs: [build, rust-test]
+    defaults:
+      run:
+        working-directory: erebyx-sdk-node
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          path: erebyx-sdk-node
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+          cache: npm
+          cache-dependency-path: erebyx-sdk-node/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: erebyx-sdk-node/artifacts
+
+      - name: Stage native binaries into npm/ subpackages
+        # napi artifacts moves the downloaded .node files into the
+        # right per-platform npm/{triple}/ directories. napi prepublish
+        # then bumps versions + assembles the optionalDependencies
+        # entries on the parent package.
+        run: npx napi artifacts --dir artifacts
+
+      - name: Generate platform subpackages
+        run: npx napi prepublish -t npm --skip-gh-release
+
+      - name: Publish to npm with provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # --access public is set in publishConfig in package.json.
+          # --provenance generates an in-toto attestation tying the
+          # published artifact to this exact workflow run.
+          npm publish --provenance
