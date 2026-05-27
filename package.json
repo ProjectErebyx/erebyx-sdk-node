@@ -26,11 +26,12 @@
     "types.js",
     "types.d.ts",
     "*.node",
-    "LICENSE",
+    "LICENSE-MIT",
+    "LICENSE-APACHE-2.0",
     "NOTICE",
     "README.md"
   ],
-  "license": "Apache-2.0",
+  "license": "MIT OR Apache-2.0",
   "publishConfig": {
     "access": "public"
   },
