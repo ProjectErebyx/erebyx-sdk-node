@@ -257,18 +257,16 @@ impl Memory {
         let result = builder.send().await.map_err(sdk_error_to_napi)?;
 
         Ok(JsWrapUpResult {
-            status: result.status,
             handoff_id: result.handoff_id,
-            created_memories: result
-                .created_memories
-                .into_iter()
-                .map(|m| JsCreatedMemory {
-                    r#type: m.kind,
-                    id: m.id,
-                })
-                .collect(),
-            errors: result.errors,
-            message: result.message,
+            session_id: result.session_id,
+            anchors: result.anchors,
+            summary: result.summary,
+            saves_persisted: result.saves_persisted,
+            reflections_persisted: result.reflections_persisted,
+            next_action_hint: result.next_action_hint,
+            narrative: result.narrative,
+            suggested_next_call: result.suggested_next_call.map(js_suggested_next_call),
+            meta: result.meta.map(js_tool_meta),
             hints: result.hints,
             auto_fired: result.auto_fired,
         })
@@ -276,8 +274,8 @@ impl Memory {
 
     /// Load identity at session start.
     ///
-    /// Call this FIRST at the start of every session to restore identity,
-    /// values, and foundation memories.
+    /// Loads identity, ethos, foundation memories, topology, and continuity
+    /// signals from the substrate's `POST /v0/identity/restore` route.
     #[napi]
     pub async fn restore_identity(
         &self,
@@ -299,10 +297,31 @@ impl Memory {
         let result = builder.send().await.map_err(sdk_error_to_napi)?;
 
         Ok(JsRestoreIdentityResult {
-            name: result.name,
-            anchor: result.anchor,
-            core_values: result.core_values,
-            foundation_anchors: result.foundation_anchors,
+            identity: JsIdentityCore {
+                name: result.identity.name,
+                instance_id: result.identity.instance_id,
+                origin_statement: result.identity.origin_statement,
+                persona_summary: result.identity.persona_summary,
+            },
+            ethos: result.ethos,
+            foundation_memories: result
+                .foundation_memories
+                .into_iter()
+                .map(|m| JsFoundationMemoryItem {
+                    id: m.id,
+                    title: m.title,
+                    snippet: m.snippet,
+                    anchors: m.anchors,
+                    captured_at: m.captured_at,
+                })
+                .collect(),
+            topology: hashmap_to_value(result.topology),
+            continuity: hashmap_to_value(result.continuity),
+            needs_onboarding: result.needs_onboarding,
+            memory_guide: result.memory_guide,
+            narrative: result.narrative,
+            suggested_next_call: result.suggested_next_call.map(js_suggested_next_call),
+            meta: result.meta.map(js_tool_meta),
             hints: result.hints,
             auto_fired: result.auto_fired,
         })
@@ -310,8 +329,8 @@ impl Memory {
 
     /// Load work context after restore_identity.
     ///
-    /// Loads where you left off: recent handoffs, related memories, and skills.
-    /// This generates the session_id needed for session tracking.
+    /// POSTs to `/v0/session/load` and returns the most-recent matching
+    /// handoff, related memories, integrated skills, and a per-session id.
     #[napi]
     pub async fn load_context(
         &self,
@@ -323,24 +342,71 @@ impl Memory {
         if let Some(anchors) = &opts.anchors {
             builder = builder.anchors(anchors.iter().map(|s| s.as_str()).collect());
         }
+        if let Some(mode) = &opts.mode {
+            builder = builder.mode(mode);
+        }
+        if let Some(spec) = &opts.specialization_name {
+            builder = builder.specialization_name(spec);
+        }
         if let Some(level) = &opts.detail_level {
             builder = builder.detail_level(level);
         }
-        if let Some(mode) = &opts.mode {
-            builder = builder.mode(mode);
+        if let Some(priority) = &opts.load_priority {
+            builder = builder.load_priority(priority);
         }
 
         let result = builder.send().await.map_err(sdk_error_to_napi)?;
 
         Ok(JsLoadContextResult {
             session_id: result.session_id,
-            status: result.status,
             anchors: result.anchors,
-            energy: result.energy,
-            momentum_summary: result.momentum_summary,
+            handoff: result.handoff.map(|h| JsHandoffSummary {
+                id: h.id,
+                summary: h.summary,
+                anchors: h.anchors,
+                captured_at: h.captured_at,
+            }),
+            related_memories: result
+                .related_memories
+                .into_iter()
+                .map(|m| JsRelatedMemoryItem {
+                    id: m.id,
+                    title: m.title,
+                    snippet: m.snippet,
+                    anchors: m.anchors,
+                    relevance_tier: m.relevance_tier,
+                })
+                .collect(),
+            skills: result.skills,
+            topology: hashmap_to_value(result.topology),
+            narrative: result.narrative,
+            suggested_next_call: result.suggested_next_call.map(js_suggested_next_call),
+            meta: result.meta.map(js_tool_meta),
             hints: result.hints,
             auto_fired: result.auto_fired,
         })
+    }
+}
+
+fn hashmap_to_value(
+    m: std::collections::HashMap<String, serde_json::Value>,
+) -> serde_json::Value {
+    serde_json::Value::Object(m.into_iter().collect())
+}
+
+fn js_suggested_next_call(s: erebyx_sdk::types::SuggestedNextCall) -> JsSuggestedNextCall {
+    JsSuggestedNextCall {
+        tool: s.tool,
+        args: serde_json::Value::Object(s.args.into_iter().collect()),
+        reason: s.reason,
+    }
+}
+
+fn js_tool_meta(m: erebyx_sdk::types::ToolMeta) -> JsToolMeta {
+    JsToolMeta {
+        schema_version: m.schema_version,
+        request_id: m.request_id,
+        latency_ms: m.latency_ms,
     }
 }
 
@@ -440,11 +506,16 @@ pub struct JsWrapUpMemory {
 
 #[napi(object)]
 pub struct JsWrapUpResult {
-    pub status: String,
-    pub handoff_id: Option<String>,
-    pub created_memories: Vec<JsCreatedMemory>,
-    pub errors: Vec<String>,
-    pub message: Option<String>,
+    pub handoff_id: String,
+    pub session_id: String,
+    pub anchors: Vec<String>,
+    pub summary: String,
+    pub saves_persisted: i64,
+    pub reflections_persisted: i64,
+    pub next_action_hint: String,
+    pub narrative: String,
+    pub suggested_next_call: Option<JsSuggestedNextCall>,
+    pub meta: Option<JsToolMeta>,
     /// Substrate lifecycle hints (`X-Erebyx-Hint` response header).
     pub hints: Vec<String>,
     /// Tools the substrate auto-fired on this call
@@ -452,10 +523,23 @@ pub struct JsWrapUpResult {
     pub auto_fired: Vec<String>,
 }
 
+// =========================================================================
+// Shared lifecycle types
+// =========================================================================
+
 #[napi(object)]
-pub struct JsCreatedMemory {
-    pub r#type: String,
-    pub id: String,
+pub struct JsSuggestedNextCall {
+    pub tool: String,
+    /// Suggested args dict — opaque JSON object the substrate emits.
+    pub args: serde_json::Value,
+    pub reason: String,
+}
+
+#[napi(object)]
+pub struct JsToolMeta {
+    pub schema_version: String,
+    pub request_id: Option<String>,
+    pub latency_ms: Option<i64>,
 }
 
 // =========================================================================
@@ -471,11 +555,38 @@ pub struct JsRestoreIdentityOptions {
 }
 
 #[napi(object)]
-pub struct JsRestoreIdentityResult {
+pub struct JsIdentityCore {
     pub name: String,
-    pub anchor: Option<String>,
-    pub core_values: Vec<String>,
-    pub foundation_anchors: Vec<String>,
+    pub instance_id: String,
+    pub origin_statement: String,
+    pub persona_summary: Option<String>,
+}
+
+#[napi(object)]
+pub struct JsFoundationMemoryItem {
+    pub id: String,
+    pub title: Option<String>,
+    pub snippet: String,
+    pub anchors: Vec<String>,
+    pub captured_at: Option<String>,
+}
+
+#[napi(object)]
+pub struct JsRestoreIdentityResult {
+    pub identity: JsIdentityCore,
+    pub ethos: Vec<String>,
+    pub foundation_memories: Vec<JsFoundationMemoryItem>,
+    /// Concept priming for attention. Opaque JSON object — substrate
+    /// emits categorical buckets per the WHAT-not-HOW doctrine.
+    pub topology: serde_json::Value,
+    /// Drift-detector continuity signals. Opaque JSON object with
+    /// `last_session_ago` / `signals` / `signals_count` keys.
+    pub continuity: serde_json::Value,
+    pub needs_onboarding: bool,
+    pub memory_guide: Option<String>,
+    pub narrative: String,
+    pub suggested_next_call: Option<JsSuggestedNextCall>,
+    pub meta: Option<JsToolMeta>,
     /// Substrate lifecycle hints (`X-Erebyx-Hint` response header).
     pub hints: Vec<String>,
     /// Tools the substrate auto-fired on this call
@@ -491,17 +602,44 @@ pub struct JsRestoreIdentityResult {
 #[derive(Default)]
 pub struct JsLoadContextOptions {
     pub anchors: Option<Vec<String>>,
-    pub detail_level: Option<String>,
     pub mode: Option<String>,
+    /// When `mode === "specialization"`, the name of the specialization
+    /// to load by exact match.
+    pub specialization_name: Option<String>,
+    pub detail_level: Option<String>,
+    /// Token-budget priority: `"minimal"` | `"summary"` | `"full"`.
+    pub load_priority: Option<String>,
+}
+
+#[napi(object)]
+pub struct JsHandoffSummary {
+    pub id: String,
+    pub summary: String,
+    pub anchors: Vec<String>,
+    pub captured_at: Option<String>,
+}
+
+#[napi(object)]
+pub struct JsRelatedMemoryItem {
+    pub id: String,
+    pub title: Option<String>,
+    pub snippet: String,
+    pub anchors: Vec<String>,
+    /// Categorical bucket: high / medium / low (WHAT-not-HOW).
+    pub relevance_tier: String,
 }
 
 #[napi(object)]
 pub struct JsLoadContextResult {
-    pub session_id: Option<String>,
-    pub status: String,
+    pub session_id: String,
     pub anchors: Vec<String>,
-    pub energy: Option<String>,
-    pub momentum_summary: Option<String>,
+    pub handoff: Option<JsHandoffSummary>,
+    pub related_memories: Vec<JsRelatedMemoryItem>,
+    pub skills: Vec<String>,
+    pub topology: serde_json::Value,
+    pub narrative: String,
+    pub suggested_next_call: Option<JsSuggestedNextCall>,
+    pub meta: Option<JsToolMeta>,
     /// Substrate lifecycle hints (`X-Erebyx-Hint` response header).
     pub hints: Vec<String>,
     /// Tools the substrate auto-fired on this call
