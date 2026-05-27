@@ -232,7 +232,7 @@ try {
 ### Type imports
 
 ```typescript
-import type { SaveOptions, SaveResponse, SearchResponse, Hint } from '@erebyx/sdk'
+import type { SaveOptions, SaveResponse, SearchResponse, Hint } from '@erebyx/sdk/types'
 ```
 
 ---

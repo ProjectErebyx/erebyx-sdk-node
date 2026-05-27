@@ -172,6 +172,7 @@ impl Memory {
             status: result.status,
             hints: result.hints,
             auto_fired: result.auto_fired,
+            extra: hashmap_to_value(result.extra),
         })
     }
 
@@ -208,13 +209,22 @@ impl Memory {
                     title: m.title,
                     anchors: m.anchors,
                     importance: m.importance,
+                    // P0-B (brutal-review POSTFIX_SDK_NODE): the Rust
+                    // MemoryRecord has these fields; the napi binding
+                    // was dropping them. JS consumers doing temporal
+                    // filtering ("memories from this week") were dead
+                    // in the water until they switched to the Rust SDK.
+                    created_at: m.created_at,
+                    updated_at: m.updated_at,
                     score: m.score,
+                    extra: hashmap_to_value(m.extra),
                 })
                 .collect(),
             total_found: result.total_found as u32,
             familiarity: result.familiarity,
             hints: result.hints,
             auto_fired: result.auto_fired,
+            extra: hashmap_to_value(result.extra),
         })
     }
 
@@ -269,6 +279,7 @@ impl Memory {
             meta: result.meta.map(js_tool_meta),
             hints: result.hints,
             auto_fired: result.auto_fired,
+            extra: hashmap_to_value(result.extra),
         })
     }
 
@@ -324,6 +335,7 @@ impl Memory {
             meta: result.meta.map(js_tool_meta),
             hints: result.hints,
             auto_fired: result.auto_fired,
+            extra: hashmap_to_value(result.extra),
         })
     }
 
@@ -384,6 +396,7 @@ impl Memory {
             meta: result.meta.map(js_tool_meta),
             hints: result.hints,
             auto_fired: result.auto_fired,
+            extra: hashmap_to_value(result.extra),
         })
     }
 }
@@ -457,6 +470,12 @@ pub struct JsSaveResult {
     /// `["restore_identity", "load_context"]` on the first call against
     /// a fresh `(instance_id, session_id)` tuple. Empty thereafter.
     pub auto_fired: Vec<String>,
+    /// Forward-compat catch-all for `StoreMemoryResponse` fields not
+    /// typed individually (`action`, `dedup`, `atomization`,
+    /// `created_at`, `warnings`, `schema_version`,
+    /// `consolidation_priority`, `content_hash`). P0-A fix from
+    /// POSTFIX_SDK_NODE.
+    pub extra: serde_json::Value,
 }
 
 #[napi(object)]
@@ -469,6 +488,14 @@ pub struct JsSearchResult {
     /// Tools the substrate auto-fired on this call
     /// (`X-Erebyx-Auto-Fired` header).
     pub auto_fired: Vec<String>,
+    /// Forward-compat catch-all. Notably carries the substrate's
+    /// `formatted_text` field (pre-rendered LLM-readable output) plus
+    /// `star_context`, `abstention`, `voice_markers`, `onboarding_hint`,
+    /// `truncated`, `degraded`, `warnings`. Surfacing them as typed
+    /// fields is post-launch work; in the interim JS consumers reach
+    /// them via `result.extra.formatted_text` etc. (P0-A fix from
+    /// POSTFIX_SDK_NODE.)
+    pub extra: serde_json::Value,
 }
 
 #[napi(object)]
@@ -479,7 +506,18 @@ pub struct JsMemoryRecord {
     pub title: Option<String>,
     pub anchors: Vec<String>,
     pub importance: f64,
+    /// ISO-8601 timestamp from substrate (P0-B fix from
+    /// POSTFIX_SDK_NODE — was silently dropped pre-fix).
+    pub created_at: Option<String>,
+    /// ISO-8601 timestamp from substrate.
+    pub updated_at: Option<String>,
     pub score: Option<f64>,
+    /// Forward-compat catch-all. The substrate's `RememberMemoryItem`
+    /// emits 7 additional fields (`metadata`, `retrieval_path`,
+    /// `reranker_score`, `supersedes_id`, `contradiction_ids`,
+    /// `evolved_from_id`, `related_via_edges`); surface as raw JSON
+    /// until they're typed individually.
+    pub extra: serde_json::Value,
 }
 
 // =========================================================================
@@ -521,6 +559,9 @@ pub struct JsWrapUpResult {
     /// Tools the substrate auto-fired on this call
     /// (`X-Erebyx-Auto-Fired` header).
     pub auto_fired: Vec<String>,
+    /// Forward-compat catch-all for substrate fields not typed
+    /// individually. P0-A fix from POSTFIX_SDK_NODE.
+    pub extra: serde_json::Value,
 }
 
 // =========================================================================
@@ -592,6 +633,8 @@ pub struct JsRestoreIdentityResult {
     /// Tools the substrate auto-fired on this call
     /// (`X-Erebyx-Auto-Fired` header).
     pub auto_fired: Vec<String>,
+    /// Forward-compat catch-all. P0-A fix from POSTFIX_SDK_NODE.
+    pub extra: serde_json::Value,
 }
 
 // =========================================================================
@@ -645,4 +688,6 @@ pub struct JsLoadContextResult {
     /// Tools the substrate auto-fired on this call
     /// (`X-Erebyx-Auto-Fired` header).
     pub auto_fired: Vec<String>,
+    /// Forward-compat catch-all. P0-A fix from POSTFIX_SDK_NODE.
+    pub extra: serde_json::Value,
 }
