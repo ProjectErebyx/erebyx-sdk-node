@@ -12,7 +12,7 @@
 
 ```bash
 npm install @erebyx/sdk
-export EREBYX_API_KEY="erebyx_..."
+export EREBYX_API_KEY="<YOUR_API_KEY>"   # get one at https://app.erebyx.com/keys
 ```
 
 ```typescript
@@ -85,7 +85,7 @@ const memory = Memory.fromEnv()
 
 ```bash
 # Required
-export EREBYX_API_KEY="erebyx_..."
+export EREBYX_API_KEY="<YOUR_API_KEY>"
 
 # Required for tenants registered at v0.1.1+ (Argon2id-default-on).
 # Find this in your dashboard recovery panel; treat it like a master
@@ -167,12 +167,13 @@ Stable `code` values: `AUTH`, `CIRCUIT_OPEN`, `RATE_LIMITED`, `NETWORK`, `SERVER
 
 ## Native binaries
 
-Pre-built native binaries are published per platform on every npm release:
-- macOS — arm64, x64
-- Linux — arm64, x64 (glibc)
-- Windows — x64
+v0.1.1 ships a prebuilt native binary for **macOS arm64 (Apple Silicon)**.
+Every other platform — macOS x64, Linux arm64, Linux x64, Windows x64 —
+builds from source on install (requires Rust 1.77+).
 
-If your platform is unsupported, `@erebyx/sdk` falls back to building from source on install (requires Rust 1.77+).
+Per-platform prebuilds land in v0.1.2 once the cross-compile CI is wired.
+If you don't have Rust installed, `rustup` is the one-line install:
+<https://rustup.rs>.
 
 ---
 
