@@ -4,9 +4,11 @@ version = "0.1.1"
 edition = "2021"
 rust-version = "1.77"
 description = "Native Node.js bindings for Erebyx memory SDK (via napi-rs)"
-license = "Apache-2.0"
+license = "MIT OR Apache-2.0"
 # Block accidental crates.io publish — this is a napi-rs internal crate.
-# The npm package (@erebyx/sdk) is the public surface; it's gated by package.json "private": true.
+# The npm package (@erebyx/sdk) is the public surface; cargo publish would
+# not produce a useful artifact for end users (the .node binary + JS
+# wrapper are the consumer surface).
 publish = false
 
 [lib]

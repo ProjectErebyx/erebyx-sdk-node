@@ -14,4 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 This package includes native bindings via napi-rs to the underlying
-erebyx-sdk Rust crate, which is also licensed Apache-2.0.
+erebyx-sdk Rust crate, which is also dual-licensed MIT OR Apache-2.0.
+
+---
+DUAL LICENSE NOTICE (added 2026-05-27):
+This package is dual-licensed under MIT OR Apache-2.0 at your option.
+- LICENSE-MIT: MIT License (no patent grant)
+- LICENSE-APACHE-2.0: Apache License 2.0 (with §3 patent grant)
+The original NOTICE attribution above applies when used under Apache-2.0.
