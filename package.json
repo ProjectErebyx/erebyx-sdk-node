@@ -14,7 +14,8 @@
       "default": "./errors.js"
     },
     "./types": {
-      "types": "./types.d.ts"
+      "types": "./types.d.ts",
+      "default": "./types.js"
     }
   },
   "files": [
@@ -22,6 +23,7 @@
     "index.d.ts",
     "errors.js",
     "errors.d.ts",
+    "types.js",
     "types.d.ts",
     "*.node",
     "LICENSE",
@@ -71,6 +73,7 @@
   },
   "scripts": {
     "build": "napi build --platform --release",
-    "build:debug": "napi build --platform"
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm --skip-gh-release"
   }
 }

@@ -87,12 +87,20 @@ const memory = Memory.fromEnv()
 # Required
 export EREBYX_API_KEY="erebyx_..."
 
+# Required for tenants registered at v0.1.1+ (Argon2id-default-on).
+# Find this in your dashboard recovery panel; treat it like a master
+# encryption key — losing it AND the BIP39 recovery seed is
+# unrecoverable by design (zero-knowledge property).
+export EREBYX_PASSPHRASE="<YOUR_PASSPHRASE>"
+
 # Optional (defaults shown)
 export EREBYX_API_URL="https://core.erebyx.com"
 export EREBYX_INSTANCE_ID="default"
 ```
 
 Get your API key at [app.erebyx.com/keys](https://app.erebyx.com/keys).
+The dashboard surfaces the matching `EREBYX_PASSPHRASE` value at
+registration; both are required for new tenants.
 
 ---
 

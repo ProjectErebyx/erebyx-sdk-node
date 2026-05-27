@@ -19,11 +19,19 @@ export {
   JsWrapUpOptions as WrapUpOptions,
   JsWrapUpMemory as WrapUpMemory,
   JsWrapUpResult as WrapUpResponse,
-  JsCreatedMemory as CreatedMemory,
   JsRestoreIdentityOptions as RestoreIdentityOptions,
   JsRestoreIdentityResult as RestoreIdentityResponse,
   JsLoadContextOptions as LoadContextOptions,
   JsLoadContextResult as LoadContextResponse,
+  // Bucket B shared lifecycle shapes.
+  JsSuggestedNextCall as SuggestedNextCall,
+  JsToolMeta as ToolMeta,
+  // restore_identity nested shapes.
+  JsIdentityCore as IdentityCore,
+  JsFoundationMemoryItem as FoundationMemoryItem,
+  // load_context nested shapes.
+  JsHandoffSummary as HandoffSummary,
+  JsRelatedMemoryItem as RelatedMemoryItem,
 } from './index';
 
 /**
