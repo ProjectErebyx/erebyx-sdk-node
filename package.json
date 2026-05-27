@@ -28,9 +28,10 @@
     "NOTICE",
     "README.md"
   ],
-  "_comment": "private: true blocks accidental npm publish until launch moment. Set to false (or remove) when ready to flip public.",
-  "private": true,
   "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://erebyx.com",
   "repository": {
     "type": "git",
