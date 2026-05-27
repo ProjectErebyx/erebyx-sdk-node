@@ -450,7 +450,7 @@ pub struct JsMemoryOptions {
     /// .x-conversation-id`, LLM thread id, etc.) for cross-request
     /// idempotency on `wrap_up`. (P1-B fix from POSTFIX_SDK_NODE.)
     pub session_id: Option<String>,
-    /// HTTP request timeout in milliseconds. Defaults to 30000 (30s).
+    /// HTTP request timeout in milliseconds. Defaults to 10000 (10s; inherited from the Rust SDK).
     /// Lower for latency-sensitive applications; raise for slow
     /// substrates under load. (P1-B fix from POSTFIX_SDK_NODE.)
     pub timeout_ms: Option<u32>,

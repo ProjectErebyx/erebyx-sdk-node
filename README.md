@@ -2,7 +2,7 @@
 
 > Native Node.js SDK for the EREBYX memory substrate. Built on the Rust SDK via napi-rs. Persistent AI memory across every AI you use.
 
-[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT_OR_Apache--2.0-blue.svg)](LICENSE-MIT)
 [![Version](https://img.shields.io/badge/version-0.1.1-green.svg)](CHANGELOG.md)
 [![npm](https://img.shields.io/badge/npm-%40erebyx%2Fsdk-red.svg)](https://www.npmjs.com/package/@erebyx/sdk)
 
@@ -221,7 +221,7 @@ Vulnerability reports → `legal@erebyx.com`. See [SECURITY.md](SECURITY.md).
 
 ## License
 
-Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+Dual-licensed under MIT or Apache-2.0 at your option. See [LICENSE-MIT](LICENSE-MIT), [LICENSE-APACHE-2.0](LICENSE-APACHE-2.0), and [NOTICE](NOTICE).
 
 ---
 
