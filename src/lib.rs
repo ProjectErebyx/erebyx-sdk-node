@@ -126,6 +126,18 @@ impl Memory {
         if let Some(p) = &opts.passphrase {
             builder = builder.passphrase(p);
         }
+        // P1-B (brutal-review POSTFIX_SDK_NODE): expose session_id +
+        // timeout to JS consumers. The Rust SDK supports both via
+        // MemoryBuilder; the napi binding previously dropped them.
+        // session_id is the idempotency contract for wrap_up — without
+        // an override, every Node process gets a fresh UUID v4 and
+        // can't bind to a harness-supplied conversation id.
+        if let Some(sid) = &opts.session_id {
+            builder = builder.session_id(sid);
+        }
+        if let Some(timeout_ms) = opts.timeout_ms {
+            builder = builder.timeout(std::time::Duration::from_millis(u64::from(timeout_ms)));
+        }
 
         let inner = builder.build().map_err(sdk_error_to_napi)?;
 
@@ -432,6 +444,16 @@ fn js_tool_meta(m: erebyx_sdk::types::ToolMeta) -> JsToolMeta {
 pub struct JsMemoryOptions {
     pub api_url: Option<String>,
     pub instance_id: Option<String>,
+    /// Override the per-process session id used on `X-Erebyx-Session-Id`.
+    /// Defaults to a fresh UUID v4 per Memory instance. Bind to a
+    /// harness-supplied conversation id (Vercel function `req.headers
+    /// .x-conversation-id`, LLM thread id, etc.) for cross-request
+    /// idempotency on `wrap_up`. (P1-B fix from POSTFIX_SDK_NODE.)
+    pub session_id: Option<String>,
+    /// HTTP request timeout in milliseconds. Defaults to 30000 (30s).
+    /// Lower for latency-sensitive applications; raise for slow
+    /// substrates under load. (P1-B fix from POSTFIX_SDK_NODE.)
+    pub timeout_ms: Option<u32>,
     /// Per-tenant passphrase for Argon2id-default-on Genesis Arche
     /// tenants (Lock #20, 2026-05-18). Required at v0.1.1+ for any
     /// tenant registered with `encryption_mode: argon2_passphrase`.
