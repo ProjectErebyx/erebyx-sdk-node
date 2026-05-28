@@ -22,7 +22,7 @@ const res = await memory.save('Anchor retrieval improves recall by 40%', 'insigh
 console.log('saved', res.memoryId, 'hints:', res.hints)
 ```
 
-That's the whole loop: install -> save. Memory is encrypted in transit (TLS 1.3) and at rest (per-tenant AES-256-GCM, server-side). End-to-end client-side encryption (true zero-knowledge — server NEVER sees plaintext) is on the v0.2+ roadmap.
+That's the whole loop: install -> save. Memory is encrypted in transit (TLS 1.3) and at rest using XChaCha20-Poly1305 envelope encryption (AES-256-GCM legacy supported on existing rows) with per-tenant Key Encryption Keys wrapped under a server-held master KEK. Per-user zero-knowledge encryption (passphrase-derived keys, EREBYX cannot decrypt) ships in v0.2.
 
 ---
 
