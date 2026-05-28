@@ -51,7 +51,7 @@ Out of scope:
 
 | Area | Current limitation | Target fix |
 |---|---|---|
-| Client-side encryption | Memory content currently encrypted server-side (per-tenant AES-256-GCM); transit is TLS 1.3. End-to-end client-side encryption (true zero-knowledge — server NEVER sees plaintext) is on the v0.2+ roadmap. The browser extension already implements client-side AES-256-GCM today. | v0.2+ |
+| Client-side encryption | Memory is encrypted in transit (TLS 1.3) and at rest using XChaCha20-Poly1305 envelope encryption (AES-256-GCM legacy supported on existing rows) with per-tenant Key Encryption Keys wrapped under a server-held master KEK. At v0.1.1 EREBYX operationally holds the master KEK; per-user zero-knowledge encryption (passphrase-derived keys, EREBYX cannot decrypt) ships in v0.2. The browser extension already implements client-side AES-256-GCM today. | v0.2 |
 | API-key rotation | Manual rotation via `app.erebyx.com/keys`; SDK does not yet auto-rotate | v0.2 |
 | Native binary signing | Pre-built binaries are checksummed but not yet signed | v0.1.x |
 

@@ -22,7 +22,7 @@ First public release. Native Node.js client over the EREBYX v0.1.1 cognitive sur
 - **Typed errors** — `code: 'AUTH'`, `code: 'NETWORK'`, `code: 'CIRCUIT_OPEN'`, `code: 'SERVER'`
 - **`X-Erebyx-Hint` protocol support** — every response includes `hints: string[]`. Hint values: `wrap_up_recommended`, `restore_identity_recommended`, `load_context_recommended`, `compact_imminent`. Honoring hints is optional.
 - **Cold-session auto-fire transparency** — `response.autoFired: string[]` reports any `restore_identity` / `load_context` runs the substrate fired transparently on first session contact.
-- **Encryption** — TLS 1.3 in transit, per-tenant AES-256-GCM at rest server-side. End-to-end client-side encryption ships in v0.1.x.
+- **Encryption** — TLS 1.3 in transit; at rest XChaCha20-Poly1305 envelope encryption (AES-256-GCM legacy supported on existing rows) with per-tenant Key Encryption Keys wrapped under a server-held master KEK. Per-user zero-knowledge encryption (passphrase-derived keys, EREBYX cannot decrypt) ships in v0.2.
 - **Pre-built native binary** — macOS arm64 ships prebuilt; other platforms (macOS x64, Linux arm64/x64, Windows x64) build from source on install (requires Rust 1.77+). Per-platform prebuilds land in v0.1.2 once cross-compile CI is wired.
 
 ### Configuration
