@@ -366,12 +366,6 @@ impl Memory {
         if let Some(anchors) = &opts.anchors {
             builder = builder.anchors(anchors.iter().map(|s| s.as_str()).collect());
         }
-        if let Some(mode) = &opts.mode {
-            builder = builder.mode(mode);
-        }
-        if let Some(spec) = &opts.specialization_name {
-            builder = builder.specialization_name(spec);
-        }
         if let Some(level) = &opts.detail_level {
             builder = builder.detail_level(level);
         }
