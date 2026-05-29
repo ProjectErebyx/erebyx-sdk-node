@@ -1,0 +1,67 @@
+# Self-hosted CI for erebyx-sdk-node (public OSS carve-out, napi-rs binding).
+#
+# Runs on EREBYX self-hosted runners — no GitHub Actions billing
+# (bootstrapped-forever / self-hosted-only posture). Gates rustfmt, clippy,
+# the napi release build, and a native-module load smoke on Linux x64.
+#
+# Multi-platform prebuilds (macOS/Windows/musl) are NOT built here — those
+# require GitHub-hosted runners (billing). The published package ships the
+# Linux prebuild + a build-from-source fallback (napi-rs builds from the
+# bundled Rust crate on install for other platforms).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build-lint:
+    name: napi build + lint (self-hosted linux)
+    runs-on: [self-hosted, linux, x64, erebyx]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: rustfmt --check
+        run: cargo fmt --all -- --check
+
+      - name: clippy (-D warnings)
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: npm ci
+        run: npm ci
+
+      - name: napi build (release)
+        run: npm run build
+
+      - name: native module loads (smoke)
+        # The real "does it work" gate for a binding: build the .node and
+        # confirm Node can require the package entry without a link error.
+        run: node -e "require('./'); console.log('erebyx-sdk-node loaded OK')"
