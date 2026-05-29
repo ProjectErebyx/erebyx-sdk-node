@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Native Node.js bindings for the Erebyx SDK via napi-rs.
+//! Native Node.js bindings for the EREBYX SDK via napi-rs.
 //!
 //! This exposes the Rust SDK as a native Node.js addon, giving JS/TS apps
 //! the same performance and reliability as the Rust SDK directly.
@@ -99,14 +99,17 @@ pub struct Memory {
 impl Memory {
     /// Create a new Memory client.
     ///
-    /// @param apiKey - Your Erebyx API key (erebyx_...)
+    /// @param apiKey - Your EREBYX API key (erebyx_...)
     /// @param options - Optional configuration `{ apiUrl, instanceId, passphrase }`.
     ///   - `passphrase` is REQUIRED for Genesis Arche tenants registered at
     ///     v0.1.1+ (Argon2id-default-on, Lock #20 2026-05-18). The substrate
     ///     hashes it with the tenant's stored Argon2id parameters at request
-    ///     time to derive the KEK that decrypts the tenant data envelope.
-    ///     **The server never persists it.** Lose the passphrase AND the
-    ///     BIP39 recovery seed → data is unrecoverable by design.
+    ///     time to derive a per-tenant KEK; the server never persists the
+    ///     passphrase itself. At v0.1.1 this is NOT zero-knowledge — the
+    ///     tenant KEK is also wrapped under a server-held master KEK EREBYX
+    ///     holds, so EREBYX can still decrypt and a lost passphrase is
+    ///     recoverable. Per-user zero-knowledge (passphrase + BIP39 seed as
+    ///     the only keys; losing both is unrecoverable) ships in v0.2.
     ///   - Omit for legacy `hkdf_api_key` tenants registered before v0.1.1.
     #[napi(constructor)]
     pub fn new(api_key: String, options: Option<JsMemoryOptions>) -> Result<Self> {
