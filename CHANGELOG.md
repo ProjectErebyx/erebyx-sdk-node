@@ -8,6 +8,18 @@ The underlying Rust crate is [`erebyx-sdk`](https://github.com/ProjectErebyx/ere
 
 ---
 
+## [Unreleased] — pre-Genesis Arche launch tightening
+
+### Changed (breaking, pre-launch)
+
+- **`JsLoadContextOptions.mode` + `.specializationName` fields removed** — matches the substrate's MCP launch surface narrowing (SIMPLIFY-MODES). `mode` was a single-value enum (`"session"`) at v0.1; specialization-loading is a v0.2 feature. The substrate still accepts these fields on the wire if forwarded, but they're not part of the customer-facing TypeScript surface for v0.1.
+
+### Changed (docs)
+
+- `JsSaveResult.extra` catch-all docstring: `atomization` → `enrichment` — reflects the customer-facing rename of the substrate-internal queue envelope at the API boundary (same shape `{queued, queue_id}`, canon-clean key name per Genesis Arche brand canon).
+
+---
+
 ## [0.1.1] — 2026-04-27 — Genesis Arche
 
 First public release. Native Node.js client over the EREBYX v0.1.1 cognitive surface, built on `erebyx-sdk` (Rust) via napi-rs.
