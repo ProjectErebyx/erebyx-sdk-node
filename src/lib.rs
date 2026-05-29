@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! Native Node.js bindings for the Erebyx SDK via napi-rs.
+//! Native Node.js bindings for the EREBYX SDK via napi-rs.
 //!
 //! This exposes the Rust SDK as a native Node.js addon, giving JS/TS apps
 //! the same performance and reliability as the Rust SDK directly.
@@ -99,7 +99,7 @@ pub struct Memory {
 impl Memory {
     /// Create a new Memory client.
     ///
-    /// @param apiKey - Your Erebyx API key (erebyx_...)
+    /// @param apiKey - Your EREBYX API key (erebyx_...)
     /// @param options - Optional configuration `{ apiUrl, instanceId, passphrase }`.
     ///   - `passphrase` is REQUIRED for Genesis Arche tenants registered at
     ///     v0.1.1+ (Argon2id-default-on, Lock #20 2026-05-18). The substrate
