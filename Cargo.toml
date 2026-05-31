@@ -5,15 +5,25 @@ edition = "2021"
 rust-version = "1.77"
 description = "Native Node.js bindings for Erebyx memory SDK (via napi-rs)"
 license = "MIT OR Apache-2.0"
-# Block accidental crates.io publish — this is a napi-rs internal crate.
-# The npm package (@erebyx/sdk) is the public surface; it's gated by package.json "private": true.
+# Block accidental crates.io publish — this is a napi-rs internal cdylib,
+# not a library crate. The public distribution surface is the npm package
+# (@erebyx/sdk); this crate is only ever built (never published) — either
+# from the npm tarball at install time (build-from-source fallback) or in CI.
 publish = false
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-erebyx-sdk = { path = "../erebyx-sdk" }
+# Registry dependency so the Rust source shipped in the npm tarball can
+# build-from-source on any platform lacking a prebuilt .node — Cargo resolves
+# erebyx-sdk 0.1.1 from crates.io. For in-repo / CI builds against the local
+# sibling checkout, a gitignored .cargo/config.toml [patch.crates-io] overrides
+# this to `path = "../erebyx-sdk"` (CI generates it after checking the crate out;
+# see .github/workflows/release.yml). Never use a bare `path = ...` here: a path
+# key in the committed manifest makes Cargo hard-fail when the sibling is absent,
+# which is exactly the build-from-source case in a customer's node_modules.
+erebyx-sdk = "0.1.1"
 napi = { version = "2", features = ["async", "tokio_rt", "serde-json"] }
 napi-derive = "2"
 serde = { version = "1", features = ["derive"] }
