@@ -26,6 +26,11 @@
     "types.js",
     "types.d.ts",
     "*.node",
+    "src",
+    "build.rs",
+    "Cargo.toml",
+    "Cargo.lock",
+    "scripts/build-from-source.js",
     "LICENSE-MIT",
     "LICENSE-APACHE-2.0",
     "NOTICE",
@@ -81,6 +86,7 @@
   },
   "scripts": {
     "build": "napi build --platform --release",
-    "build:debug": "napi build --platform"
+    "build:debug": "napi build --platform",
+    "install": "node scripts/build-from-source.js"
   }
 }

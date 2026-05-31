@@ -1,6 +1,12 @@
 # Build (Rust)
 /target
 
+# Local/CI-only crates.io patch pointing at the sibling erebyx-sdk checkout.
+# Must NEVER be committed or packed: the committed Cargo.toml ships a pure
+# registry dep so the npm tarball builds from crates.io; this patch only exists
+# for in-repo / CI builds against local source (release.yml generates it).
+/.cargo
+
 # Build (Node)
 /dist
 /node_modules

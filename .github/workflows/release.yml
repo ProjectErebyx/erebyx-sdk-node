@@ -1,0 +1,219 @@
+# Release pipeline for @erebyx/sdk (napi-rs Node.js SDK).
+#
+# WHAT IT DOES
+#   On a `v*` tag (operator action — the real publish gate):
+#     1. build      — cross-compile a `.node` prebuild for each of the 5
+#                     supported triples (mirrors package.json `napi.triples`).
+#     2. publish    — assemble the per-platform `@erebyx/sdk-<triple>` npm
+#                     subpackages from those artifacts, then `npm publish
+#                     --provenance` every subpackage AND the parent `@erebyx/sdk`.
+#
+# SAFETY / PROVENANCE
+#   * Publish runs ONLY for `push` of a `refs/tags/v*` ref — a branch push or PR
+#     can never ship to npm. The tag is the operator's deliberate publish intent.
+#   * `--provenance` (with `id-token: write`) emits a signed in-toto attestation
+#     binding each published tarball to this exact workflow run + commit, visible
+#     on the npm package page. Requires npm registry + the `NPM_TOKEN` secret.
+#   * A pre-publish version-guard asserts the tag matches package.json `version`,
+#     so a mistyped tag can't publish a mismatched version.
+#
+# BUILD-FROM-SOURCE NOTE
+#   Cargo.toml ships a pure registry dep `erebyx-sdk = "0.1.1"` so the npm tarball
+#   builds from crates.io on customers' machines. In CI we instead build against
+#   the LOCAL sibling crate checkout via a generated `.cargo/config.toml`
+#   `[patch.crates-io]` (kept out of git + the tarball). Checking the sibling out
+#   needs the `SDK_REPO_TOKEN` secret (read-only PAT to the erebyx-sdk repo);
+#   once `erebyx-sdk 0.1.1` is live on crates.io this checkout+patch can be
+#   dropped and CI will resolve the dep from the registry like customers do.
+
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    # Manual dry-run lane: builds the matrix WITHOUT publishing (publish job is
+    # tag-gated below), so operators can validate the prebuilds before tagging.
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        working-directory: erebyx-sdk-node
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-apple-darwin
+            runner: macos-13
+            build: napi build --platform --release --target x86_64-apple-darwin
+          - target: aarch64-apple-darwin
+            runner: macos-14
+            build: napi build --platform --release --target aarch64-apple-darwin
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+            build: napi build --platform --release --target x86_64-unknown-linux-gnu
+          - target: aarch64-unknown-linux-gnu
+            runner: ubuntu-latest
+            build: |
+              rustup target add aarch64-unknown-linux-gnu
+              sudo apt-get update
+              sudo apt-get install -y gcc-aarch64-linux-gnu
+              napi build --platform --release --target aarch64-unknown-linux-gnu
+            cargo_config: |
+              [target.aarch64-unknown-linux-gnu]
+              linker = "aarch64-linux-gnu-gcc"
+          - target: x86_64-pc-windows-msvc
+            runner: windows-latest
+            build: napi build --platform --release --target x86_64-pc-windows-msvc
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          path: erebyx-sdk-node
+
+      - name: Checkout sibling erebyx-sdk crate
+        uses: actions/checkout@v4
+        with:
+          repository: ProjectErebyx/erebyx-sdk
+          path: erebyx-sdk
+          token: ${{ secrets.SDK_REPO_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: erebyx-sdk-node/package-lock.json
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+
+      - name: Patch crates-io -> local sibling crate (CI build-against-source)
+        shell: bash
+        run: |
+          # Build against the sibling checkout instead of crates.io. This is the
+          # in-repo equivalent of a local dev .cargo/config.toml — it is NOT
+          # committed and NOT shipped in the npm tarball; customers build the
+          # pure registry dep from Cargo.toml. Path is relative to this crate.
+          mkdir -p .cargo
+          printf '%s\n' '[patch.crates-io]' 'erebyx-sdk = { path = "../erebyx-sdk" }' > .cargo/config.toml
+
+      - name: Configure cross-link (Linux ARM64 only)
+        if: matrix.cargo_config != ''
+        shell: bash
+        run: |
+          printf '%s\n' "${{ matrix.cargo_config }}" >> .cargo/config.toml
+
+      - name: Install dependencies (skip source-build install hook)
+        shell: bash
+        # The `install` lifecycle script builds-from-source when no prebuild is
+        # present; in CI we build explicitly via napi below, so suppress it.
+        run: npm ci --ignore-scripts || npm install --ignore-scripts
+
+      - name: Build
+        shell: bash
+        run: ${{ matrix.build }}
+
+      - name: Smoke-test build artifact (native-arch runners only)
+        if: matrix.target != 'aarch64-unknown-linux-gnu'
+        shell: bash
+        run: |
+          node -e "const sdk = require('./index.js'); console.log('Loaded:', Object.keys(sdk).sort().join(', '))"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bindings-${{ matrix.target }}
+          path: erebyx-sdk-node/*.node
+          if-no-files-found: error
+
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    # HARD GATE: publish only on a v* TAG push (operator action). workflow_dispatch
+    # and PR runs build but never publish.
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build]
+    defaults:
+      run:
+        working-directory: erebyx-sdk-node
+    permissions:
+      contents: read
+      id-token: write # required for npm --provenance attestation
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          path: erebyx-sdk-node
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+          cache: npm
+          cache-dependency-path: erebyx-sdk-node/package-lock.json
+
+      - name: Verify tag matches package.json version
+        shell: bash
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p "require('./package.json').version")"
+          if [ "$tag" != "$pkg" ]; then
+            echo "::error::tag v$tag does not match package.json version $pkg"
+            exit 1
+          fi
+          echo "tag v$tag matches package.json version $pkg"
+
+      - name: Install dependencies (skip source-build install hook)
+        shell: bash
+        run: npm ci --ignore-scripts || npm install --ignore-scripts
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: erebyx-sdk-node/artifacts
+
+      - name: Stage native binaries into npm/ subpackages
+        # `napi artifacts` moves each downloaded .node into the matching
+        # npm/<triple>/ subpackage dir.
+        run: npx napi artifacts --dir artifacts
+
+      - name: Generate platform subpackage manifests
+        # `napi prepublish` writes each @erebyx/sdk-<triple> package.json and
+        # syncs the parent optionalDependencies; --skip-gh-release keeps it npm-only.
+        run: npx napi prepublish -t npm --skip-gh-release
+
+      - name: Publish platform subpackages + parent with provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Publish each per-platform prebuild subpackage first so the parent's
+          # optionalDependencies resolve on install. --access public + provenance
+          # come from publishConfig / NPM_CONFIG_PROVENANCE.
+          for dir in npm/*/; do
+            if [ -f "$dir/package.json" ]; then
+              echo "publishing $dir"
+              npm publish "$dir" --provenance --access public
+            fi
+          done
+          # Finally publish the parent @erebyx/sdk (ships prebuilt .node files +
+          # the Rust source build-from-source fallback).
+          npm publish --provenance --access public
