@@ -34,7 +34,11 @@
     "LICENSE-MIT",
     "LICENSE-APACHE-2.0",
     "NOTICE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md",
+    "DEV_QUICKSTART.md",
+    "SECURITY.md",
+    "CONTRIBUTING.md"
   ],
   "license": "MIT OR Apache-2.0",
   "publishConfig": {
@@ -87,6 +91,7 @@
   "scripts": {
     "build": "napi build --platform --release",
     "build:debug": "napi build --platform",
-    "install": "node scripts/build-from-source.js"
+    "install": "node scripts/build-from-source.js",
+    "test": "node -e \"const sdk = require('./index.js'); if (typeof sdk.Memory !== 'function') { throw new Error('Memory export missing from built addon'); } console.log('Loaded:', Object.keys(sdk).sort().join(', '));\""
   }
 }
