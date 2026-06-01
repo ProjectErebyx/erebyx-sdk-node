@@ -101,8 +101,8 @@ impl Memory {
     ///
     /// @param apiKey - Your EREBYX API key (erebyx_...)
     /// @param options - Optional configuration `{ apiUrl, instanceId, passphrase }`.
-    ///   - `passphrase` is REQUIRED for Genesis Arche tenants registered at
-    ///     v0.1.1+ (Argon2id-default-on, Lock #20 2026-05-18). The substrate
+    ///   - `passphrase` is REQUIRED for tenants registered at
+    ///     v0.1.1+ (Argon2id-passphrase encryption is on by default). The substrate
     ///     hashes it with the tenant's stored Argon2id parameters at request
     ///     time to derive a per-tenant KEK; the server never persists the
     ///     passphrase itself. At v0.1.1 this is NOT zero-knowledge — the
@@ -122,16 +122,15 @@ impl Memory {
         if let Some(id) = &opts.instance_id {
             builder = builder.instance_id(id);
         }
-        // Argon2id-default-on (Lock #20, 2026-05-18). The Rust builder
+        // Argon2id passphrase encryption is on by default. The Rust builder
         // silently drops empty/whitespace input, so passing through is
         // safe: the SDK boundary distinguishes "header absent" (legacy
         // hkdf_api_key tenant) from "header empty" (substrate rejects).
         if let Some(p) = &opts.passphrase {
             builder = builder.passphrase(p);
         }
-        // P1-B (brutal-review POSTFIX_SDK_NODE): expose session_id +
-        // timeout to JS consumers. The Rust SDK supports both via
-        // MemoryBuilder; the napi binding previously dropped them.
+        // Expose session_id + timeout to JS consumers. The Rust SDK
+        // supports both via MemoryBuilder.
         // session_id is the idempotency contract for wrap_up — without
         // an override, every Node process gets a fresh UUID v4 and
         // can't bind to a harness-supplied conversation id.
@@ -224,11 +223,9 @@ impl Memory {
                     title: m.title,
                     anchors: m.anchors,
                     importance: m.importance,
-                    // P0-B (brutal-review POSTFIX_SDK_NODE): the Rust
-                    // MemoryRecord has these fields; the napi binding
-                    // was dropping them. JS consumers doing temporal
-                    // filtering ("memories from this week") were dead
-                    // in the water until they switched to the Rust SDK.
+                    // Surface the record timestamps so JS consumers can do
+                    // temporal filtering ("memories from this week") without
+                    // dropping down to the Rust SDK.
                     created_at: m.created_at,
                     updated_at: m.updated_at,
                     score: m.score,
@@ -445,14 +442,14 @@ pub struct JsMemoryOptions {
     /// Defaults to a fresh UUID v4 per Memory instance. Bind to a
     /// harness-supplied conversation id (Vercel function `req.headers
     /// .x-conversation-id`, LLM thread id, etc.) for cross-request
-    /// idempotency on `wrap_up`. (P1-B fix from POSTFIX_SDK_NODE.)
+    /// idempotency on `wrap_up`.
     pub session_id: Option<String>,
     /// HTTP request timeout in milliseconds. Defaults to 10000 (10s; inherited from the Rust SDK).
     /// Lower for latency-sensitive applications; raise for slow
-    /// substrates under load. (P1-B fix from POSTFIX_SDK_NODE.)
+    /// substrates under load.
     pub timeout_ms: Option<u32>,
-    /// Per-tenant passphrase for Argon2id-default-on Genesis Arche
-    /// tenants (Lock #20, 2026-05-18). Required at v0.1.1+ for any
+    /// Per-tenant passphrase for tenants using Argon2id-passphrase
+    /// encryption (on by default at v0.1.1+). Required for any
     /// tenant registered with `encryption_mode: argon2_passphrase`.
     /// Omit for legacy `hkdf_api_key` tenants — the substrate
     /// distinguishes header-absent (legacy) from header-empty (reject).
@@ -514,8 +511,7 @@ pub struct JsSearchResult {
     /// `star_context`, `abstention`, `voice_markers`, `onboarding_hint`,
     /// `truncated`, `degraded`, `warnings`. Surfacing them as typed
     /// fields is post-launch work; in the interim JS consumers reach
-    /// them via `result.extra.formatted_text` etc. (P0-A fix from
-    /// POSTFIX_SDK_NODE.)
+    /// them via `result.extra.formatted_text` etc.
     pub extra: serde_json::Value,
 }
 
@@ -527,8 +523,7 @@ pub struct JsMemoryRecord {
     pub title: Option<String>,
     pub anchors: Vec<String>,
     pub importance: f64,
-    /// ISO-8601 timestamp from substrate (P0-B fix from
-    /// POSTFIX_SDK_NODE — was silently dropped pre-fix).
+    /// ISO-8601 timestamp from substrate.
     pub created_at: Option<String>,
     /// ISO-8601 timestamp from substrate.
     pub updated_at: Option<String>,
@@ -581,7 +576,7 @@ pub struct JsWrapUpResult {
     /// (`X-Erebyx-Auto-Fired` header).
     pub auto_fired: Vec<String>,
     /// Forward-compat catch-all for substrate fields not typed
-    /// individually. P0-A fix from POSTFIX_SDK_NODE.
+    /// individually.
     pub extra: serde_json::Value,
 }
 
@@ -654,7 +649,7 @@ pub struct JsRestoreIdentityResult {
     /// Tools the substrate auto-fired on this call
     /// (`X-Erebyx-Auto-Fired` header).
     pub auto_fired: Vec<String>,
-    /// Forward-compat catch-all. P0-A fix from POSTFIX_SDK_NODE.
+    /// Forward-compat catch-all.
     pub extra: serde_json::Value,
 }
 
@@ -666,13 +661,11 @@ pub struct JsRestoreIdentityResult {
 #[derive(Default)]
 pub struct JsLoadContextOptions {
     pub anchors: Option<Vec<String>>,
-    // SIMPLIFY-MODES (Genesis Arche T-5 days, 2026-05-27): the
-    // ``mode`` + ``specialization_name`` fields were dropped to match
-    // the substrate's MCP launch surface narrowing (PR #963).
-    // ``mode`` was a single-value enum (``"session"``) at v0.1;
-    // specialization-loading is a v0.2 feature. The substrate still
-    // accepts these fields on the wire if forwarded, but they're not
-    // part of the customer-facing SDK surface for v0.1.
+    // The ``mode`` + ``specialization_name`` fields were dropped to match
+    // the substrate's launch surface. ``mode`` was a single-value enum
+    // (``"session"``) at v0.1; specialization-loading is a v0.2 feature.
+    // The substrate still accepts these fields on the wire if forwarded,
+    // but they're not part of the customer-facing SDK surface for v0.1.
     pub detail_level: Option<String>,
     /// Token-budget priority: `"minimal"` | `"summary"` | `"full"`.
     pub load_priority: Option<String>,
@@ -712,6 +705,6 @@ pub struct JsLoadContextResult {
     /// Tools the substrate auto-fired on this call
     /// (`X-Erebyx-Auto-Fired` header).
     pub auto_fired: Vec<String>,
-    /// Forward-compat catch-all. P0-A fix from POSTFIX_SDK_NODE.
+    /// Forward-compat catch-all.
     pub extra: serde_json::Value,
 }
