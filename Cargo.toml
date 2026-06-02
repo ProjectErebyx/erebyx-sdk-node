@@ -3,7 +3,7 @@ name = "erebyx-sdk-node"
 version = "0.1.1"
 edition = "2021"
 rust-version = "1.77"
-description = "Native Node.js bindings for Erebyx memory SDK (via napi-rs)"
+description = "Native Node.js bindings for EREBYX memory SDK (via napi-rs)"
 license = "MIT OR Apache-2.0"
 # Block accidental crates.io publish — this is a napi-rs internal cdylib,
 # not a library crate. The public distribution surface is the npm package
