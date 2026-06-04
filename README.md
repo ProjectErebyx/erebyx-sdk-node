@@ -206,11 +206,7 @@ Requires Rust 1.77+ and Node.js 18+. The native build is driven by `napi build -
 
 - [`erebyx-cli`](https://github.com/ProjectErebyx/erebyx-cli) — Native CLI for MCP integration
 - [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk) — Rust SDK (this package wraps it)
-- [`erebyx-extension`](https://github.com/ProjectErebyx/erebyx-extension) — browser extension for ChatGPT + Claude.ai
 - [Substrate docs](https://erebyx.com/docs)
-- [Per-harness integration examples](https://github.com/ProjectErebyx/erebyx-cookbook) — 11 harnesses, copy-paste integration
-- [LangGraph example](https://github.com/ProjectErebyx/erebyx-cookbook/blob/main/langgraph/README.md) — closest match for Node-based agent graphs
-- [OpenAI Responses API example](https://github.com/ProjectErebyx/erebyx-cookbook/blob/main/openai-responses-api/README.md) — closest match for raw Node API loops
 
 ---
 
