@@ -177,18 +177,11 @@ Use this if your service handles its own session warm-up. Most users want auto-f
 
 ## Per-harness integration examples
 
-The Node SDK is one of several integration paths. For your specific harness, see the matching example in the substrate repo:
+The Node SDK is one of several integration paths. Harness-specific integration
+examples (LangGraph, OpenAI Responses API, Anthropic Agent SDK, AutoGen, CrewAI,
+Letta, raw HTTP, and more) live in the [Substrate docs](https://erebyx.com/docs).
 
-- [LangGraph](https://github.com/ProjectErebyx/erebyx-cookbook/blob/main/langgraph/README.md) — graph node lifecycle, closest match for Node-based agent graphs
-- [OpenAI Responses API](https://github.com/ProjectErebyx/erebyx-cookbook/blob/main/openai-responses-api/README.md) — raw Node API integration
-- [Anthropic Agent SDK](https://github.com/ProjectErebyx/erebyx-cookbook/blob/main/anthropic-agent-sdk/README.md) — raw tool-use loop
-- [AutoGen](https://github.com/ProjectErebyx/erebyx-cookbook/blob/main/autogen/README.md) — multi-agent message events
-- [CrewAI](https://github.com/ProjectErebyx/erebyx-cookbook/blob/main/crewai/README.md) — role-based agent lifecycle
-- [Letta](https://github.com/ProjectErebyx/erebyx-cookbook/blob/main/letta/README.md) — agent self-decides cadence
-- [Raw HTTP / curl](https://github.com/ProjectErebyx/erebyx-cookbook/blob/main/raw-http/README.md) — pure HTTP reference
-- [Future / unknown harness](https://github.com/ProjectErebyx/erebyx-cookbook/blob/main/future-harness/README.md) — protocol-level forward-compat
-
-All examples honor the same `X-Erebyx-Hint` protocol described above.
+Every harness honors the same `X-Erebyx-Hint` protocol described above.
 
 ---
 
