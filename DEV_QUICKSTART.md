@@ -178,8 +178,9 @@ Use this if your service handles its own session warm-up. Most users want auto-f
 ## Per-harness integration examples
 
 The Node SDK is one of several integration paths. Harness-specific integration
-examples (LangGraph, OpenAI Responses API, Anthropic Agent SDK, AutoGen, CrewAI,
-Letta, raw HTTP, and more) live in the [Substrate docs](https://erebyx.com/docs).
+patterns (LangGraph, OpenAI Responses API, Anthropic Agent SDK, AutoGen, CrewAI,
+Letta, raw HTTP, and any future harness) are at [erebyx.com/core](https://erebyx.com/core),
+and common questions are answered at [erebyx.com/faq](https://erebyx.com/faq).
 
 Every harness honors the same `X-Erebyx-Hint` protocol described above.
 
@@ -232,7 +233,7 @@ import type { SaveOptions, SaveResponse, SearchResponse, Hint } from '@erebyx/sd
 
 ## Next steps
 
-- **Read the substrate docs**: [erebyx.com/docs](https://erebyx.com/docs)
+- **Read the substrate overview**: [erebyx.com/core](https://erebyx.com/core) · common questions at [erebyx.com/faq](https://erebyx.com/faq)
 - **Rust instead?**: [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk) — the underlying crate
 - **CLI shortcut?**: [`erebyx-cli`](https://github.com/ProjectErebyx/erebyx-cli) — same surface, shell-callable
 
