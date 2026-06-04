@@ -206,7 +206,7 @@ Requires Rust 1.77+ and Node.js 18+. The native build is driven by `napi build -
 
 - [`erebyx-cli`](https://github.com/ProjectErebyx/erebyx-cli) — Native CLI for MCP integration
 - [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk) — Rust SDK (this package wraps it)
-- [Substrate docs](https://erebyx.com/docs)
+- [Substrate overview](https://erebyx.com/core)
 
 ---
 

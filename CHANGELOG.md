@@ -57,7 +57,7 @@ None. First public release.
 - `import` — bulk import from ChatGPT / Claude / Markdown exports
 - `pin` / `release` — explicit memory tier control
 
-See the [v0.2 roadmap](https://erebyx.com/docs/roadmap) for cadence.
+See [erebyx.com/core](https://erebyx.com/core) for v0.2 cadence.
 
 ---
 
