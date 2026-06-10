@@ -164,7 +164,7 @@ Use this if your service handles its own session warm-up. Most users want auto-f
 
 | Error | Cause | Fix |
 |---|---|---|
-| `code: 'AUTH'` | API key missing or wrong | Check `process.env.EREBYX_API_KEY` is set and starts with `erebyx_` |
+| `code: 'AUTH'` | API key missing or wrong | Check `process.env.EREBYX_API_KEY` is set and starts with `ebx_live_` or `ebx_test_` |
 | `code: 'AUTH'` with `passphrase_required` server message | `EREBYX_PASSPHRASE` not set for an Argon2id-default-on tenant | Set `process.env.EREBYX_PASSPHRASE` to the value from the dashboard recovery panel |
 | `code: 'NETWORK'` | Connectivity / DNS / TLS | Verify `https://core.erebyx.com` is reachable from the host |
 | `code: 'CIRCUIT_OPEN'` | 3 consecutive failures within 30s | SDK is backing off; retries automatically. Check substrate health. |

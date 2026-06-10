@@ -2,7 +2,7 @@
 
 Thanks for your interest. The Node SDK is a thin napi-rs binding over the Rust [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk) crate — pull requests for ergonomic JS/TS APIs, type definitions, and platform compatibility are welcome.
 
-By contributing, you agree your contributions are licensed under [Apache-2.0](LICENSE).
+By contributing, you agree your contributions are licensed under MIT OR Apache-2.0; see [LICENSE-MIT](LICENSE-MIT) and [LICENSE-APACHE-2.0](LICENSE-APACHE-2.0).
 
 ---
 
@@ -50,10 +50,10 @@ All four must pass before a PR is reviewed.
 
 ## Native binary builds
 
-Cross-platform binaries are built via `napi build --platform --release`. Pre-built artifacts are published per platform on each npm release:
-- macOS — arm64, x64
-- Linux — arm64, x64 (glibc)
-- Windows — x64
+Cross-platform binaries are built via `napi build --platform --release`. In v0.1.1 only the **macOS arm64 (Apple Silicon)** prebuilt binary ships; every other platform builds from source on install (requires Rust 1.77+). Per-platform prebuilds for the full target matrix land in v0.1.2 once the cross-compile CI is wired:
+- macOS — arm64 (prebuilt in v0.1.1), x64 (from v0.1.2)
+- Linux — arm64, x64 (glibc) (from v0.1.2)
+- Windows — x64 (from v0.1.2)
 
 To add a new target triple, update `napi.triples.additional` in `package.json` and confirm CI cross-compilation succeeds.
 
