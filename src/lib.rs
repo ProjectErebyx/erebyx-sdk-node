@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT OR Apache-2.0
 //! Native Node.js bindings for the EREBYX SDK via napi-rs.
 //!
 //! This exposes the Rust SDK as a native Node.js addon, giving JS/TS apps
@@ -99,7 +99,7 @@ pub struct Memory {
 impl Memory {
     /// Create a new Memory client.
     ///
-    /// @param apiKey - Your EREBYX API key (erebyx_...)
+    /// @param apiKey - Your EREBYX API key (`ebx_live_...` or `ebx_test_...`)
     /// @param options - Optional configuration `{ apiUrl, instanceId, passphrase }`.
     ///   - `passphrase` is REQUIRED for tenants registered at
     ///     v0.1.1+ (Argon2id-passphrase encryption is on by default). The substrate
