@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT OR Apache-2.0
 //
 // Build-from-source fallback for @erebyx/sdk.
 //

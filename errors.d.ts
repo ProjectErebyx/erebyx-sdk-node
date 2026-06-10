@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT OR Apache-2.0
 //
 // TypeScript declarations for `@erebyx/sdk/errors` — see `errors.js`
 // for the runtime contract.
