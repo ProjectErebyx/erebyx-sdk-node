@@ -1,6 +1,6 @@
 # Contributing to @erebyx/sdk
 
-Thanks for your interest. The Node SDK is a thin napi-rs binding over the Rust [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk) crate — pull requests for ergonomic JS/TS APIs, type definitions, and platform compatibility are welcome.
+Thanks for your interest. The Node SDK is a thin napi-rs binding over the Rust [`erebyx-sdk`](https://github.com/ProjectEREBYX/erebyx-sdk) crate — pull requests for ergonomic JS/TS APIs, type definitions, and platform compatibility are welcome.
 
 By contributing, you agree your contributions are licensed under MIT OR Apache-2.0; see [LICENSE-MIT](LICENSE-MIT) and [LICENSE-APACHE-2.0](LICENSE-APACHE-2.0).
 
@@ -21,7 +21,7 @@ The DCO bot will block PRs without sign-off.
 ## Local dev setup
 
 ```bash
-git clone https://github.com/ProjectErebyx/erebyx-sdk-node.git
+git clone https://github.com/ProjectEREBYX/erebyx-sdk-node.git
 cd erebyx-sdk-node
 npm install
 npm run build           # napi build --platform --release
@@ -29,7 +29,7 @@ npm test
 ```
 
 Required toolchain:
-- Rust 1.77 or later (`rustup install stable`)
+- Rust 1.85 or later (`rustup install stable`)
 - Node.js 18 or later
 - `@napi-rs/cli` (installed via `npm install`)
 
@@ -50,7 +50,7 @@ All four must pass before a PR is reviewed.
 
 ## Native binary builds
 
-Cross-platform binaries are built via `napi build --platform --release`. In v0.1.1 only the **macOS arm64 (Apple Silicon)** prebuilt binary ships; every other platform builds from source on install (requires Rust 1.77+). Per-platform prebuilds for the full target matrix land in v0.1.2 once the cross-compile CI is wired:
+Cross-platform binaries are built via `napi build --platform --release`. In v0.1.1 only the **macOS arm64 (Apple Silicon)** prebuilt binary ships; every other platform builds from source on install (requires Rust 1.85+). Per-platform prebuilds for the full target matrix land in v0.1.2 once the cross-compile CI is wired:
 - macOS — arm64 (prebuilt in v0.1.1), x64 (from v0.1.2)
 - Linux — arm64, x64 (glibc) (from v0.1.2)
 - Windows — x64 (from v0.1.2)
@@ -100,14 +100,14 @@ In scope:
 - `X-Erebyx-Hint` parsing surfaced through `response.hints`
 
 Out of scope:
-- Underlying Rust SDK behavior — file PRs against [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk)
+- Underlying Rust SDK behavior — file PRs against [`erebyx-sdk`](https://github.com/ProjectEREBYX/erebyx-sdk)
 - Substrate behavior — file PRs against `erebyx-os`
 
 ---
 
 ## Bug reports
 
-Open a [GitHub Issue](https://github.com/ProjectErebyx/erebyx-sdk-node/issues). Include:
+Open a [GitHub Issue](https://github.com/ProjectEREBYX/erebyx-sdk-node/issues). Include:
 
 - `node --version`
 - `npm --version`

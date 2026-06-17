@@ -37,7 +37,7 @@ When v0.2 ships, v0.1.x receives security fixes for 90 days.
 In scope:
 - The `@erebyx/sdk` npm package
 - Native binary builds (the napi-rs bindings)
-- Underlying Rust SDK (separately tracked in [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk) crate)
+- Underlying Rust SDK (separately tracked in [`erebyx-sdk`](https://github.com/ProjectEREBYX/erebyx-sdk) crate)
 - TypeScript type definitions
 
 Out of scope:

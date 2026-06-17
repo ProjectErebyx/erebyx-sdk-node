@@ -171,7 +171,7 @@ Use this if your service handles its own session warm-up. Most users want auto-f
 | `code: 'SERVER'`, `status: 404` | Substrate version mismatch | Verify substrate is `v0.1.1+` |
 | `accepted: false, reason: 'below_durability_threshold'` | Save filtered as low-signal | Lower the importance gate or omit; default `min_durability=0.4` |
 | Hints never appear | Save volume below substrate threshold | Hints emit at ~12 saves/session by default. Normal early-session behavior. |
-| `npm install` fails on native build | Unsupported platform | Pre-built binaries cover macOS / Linux / Windows on common arches. For others, ensure Rust 1.77+ is installed; the install script falls back to source build. |
+| `npm install` fails on native build | Unsupported platform | Pre-built binaries cover macOS / Linux / Windows on common arches. For others, ensure Rust 1.85+ is installed; the install script falls back to source build. |
 
 ---
 
@@ -234,8 +234,8 @@ import type { SaveOptions, SaveResponse, SearchResponse, Hint } from '@erebyx/sd
 ## Next steps
 
 - **Read the substrate overview**: [erebyx.com/core](https://erebyx.com/core) · common questions at [erebyx.com/faq](https://erebyx.com/faq)
-- **Rust instead?**: [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk) — the underlying crate
-- **CLI shortcut?**: [`erebyx-cli`](https://github.com/ProjectErebyx/erebyx-cli) — same surface, shell-callable
+- **Rust instead?**: [`erebyx-sdk`](https://github.com/ProjectEREBYX/erebyx-sdk) — the underlying crate
+- **CLI shortcut?**: [`erebyx-cli`](https://github.com/ProjectEREBYX/erebyx-cli) — same surface, shell-callable
 
 ---
 

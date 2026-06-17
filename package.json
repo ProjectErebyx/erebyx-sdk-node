@@ -47,10 +47,10 @@
   "homepage": "https://erebyx.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ProjectErebyx/erebyx-sdk-node.git"
+    "url": "https://github.com/ProjectEREBYX/erebyx-sdk-node.git"
   },
   "bugs": {
-    "url": "https://github.com/ProjectErebyx/erebyx-sdk-node/issues",
+    "url": "https://github.com/ProjectEREBYX/erebyx-sdk-node/issues",
     "email": "support@erebyx.com"
   },
   "keywords": [

@@ -85,7 +85,7 @@ jobs:
       - name: Checkout sibling erebyx-sdk crate
         uses: actions/checkout@v4
         with:
-          repository: ProjectErebyx/erebyx-sdk
+          repository: ProjectEREBYX/erebyx-sdk
           path: erebyx-sdk
           token: ${{ secrets.SDK_REPO_TOKEN }}
 

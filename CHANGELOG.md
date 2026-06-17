@@ -4,7 +4,7 @@ All notable changes to `@erebyx/sdk` (Node.js) are documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
 
-The underlying Rust crate is [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk/blob/main/CHANGELOG.md). Substrate-side (private engine) release notes are summarized in each SDK release entry below.
+The underlying Rust crate is [`erebyx-sdk`](https://github.com/ProjectEREBYX/erebyx-sdk/blob/main/CHANGELOG.md). Substrate-side (private engine) release notes are summarized in each SDK release entry below.
 
 ---
 
@@ -28,7 +28,7 @@ First public release. Native Node.js client over the EREBYX v0.1.1 cognitive sur
 - **`X-Erebyx-Hint` protocol support** — every response includes `hints: string[]`. Hint values: `wrap_up_recommended`, `restore_identity_recommended`, `load_context_recommended`, `compact_imminent`. Honoring hints is optional.
 - **Cold-session auto-fire transparency** — `response.autoFired: string[]` reports any `restore_identity` / `load_context` runs the substrate fired transparently on first session contact.
 - **Encryption** — TLS 1.3 in transit; at rest XChaCha20-Poly1305 envelope encryption (AES-256-GCM legacy supported on existing rows) with per-tenant Key Encryption Keys wrapped under a server-held master KEK. Per-user zero-knowledge encryption (passphrase-derived keys, EREBYX cannot decrypt) ships in v0.2.
-- **Pre-built native binary** — macOS arm64 ships prebuilt; other platforms (macOS x64, Linux arm64/x64, Windows x64) build from source on install (requires Rust 1.77+). Per-platform prebuilds land in v0.1.2 once cross-compile CI is wired.
+- **Pre-built native binary** — macOS arm64 ships prebuilt; other platforms (macOS x64, Linux arm64/x64, Windows x64) build from source on install (requires Rust 1.85+). Per-platform prebuilds land in v0.1.2 once cross-compile CI is wired.
 
 ### Configuration
 
@@ -42,7 +42,7 @@ First public release. Native Node.js client over the EREBYX v0.1.1 cognitive sur
 ### Compatibility
 
 - **Node.js**: 18 or later
-- **Rust** (build-from-source path): 1.77+
+- **Rust** (build-from-source path): 1.85+
 - **Substrate**: requires `erebyx-os` v0.1.1+
 - **Backward compat**: hard guarantee within v0.1.x. Public API and wire protocol are stable.
 
@@ -75,4 +75,4 @@ Confirm: `npm ls @erebyx/sdk`
 
 ---
 
-[0.1.1]: https://github.com/ProjectErebyx/erebyx-sdk-node/releases/tag/v0.1.1
+[0.1.1]: https://github.com/ProjectEREBYX/erebyx-sdk-node/releases/tag/v0.1.1

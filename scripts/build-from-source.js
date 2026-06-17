@@ -18,7 +18,7 @@
 //   * Customer `npm install @erebyx/sdk` does NOT install devDependencies, so we
 //     CANNOT rely on `@napi-rs/cli` (a devDependency) at install time. We invoke
 //     `cargo` directly — the only tool the README promises is required (Rust
-//     1.77+). index.js / index.d.ts are shipped in the tarball already, so only
+//     1.85+). index.js / index.d.ts are shipped in the tarball already, so only
 //     the .node binary needs producing here.
 //   * Cargo.toml ships a pure registry dep `erebyx-sdk = "0.1.1"`, so the build
 //     resolves the dependency from crates.io with no sibling checkout required.
@@ -81,7 +81,7 @@ if (!haveCargo()) {
       '@erebyx/sdk: no prebuilt native binary for this platform (' + triple + ')',
       'and Rust/Cargo was not found to build from source.',
       '',
-      'Install Rust 1.77+ (one line):  https://rustup.rs',
+      'Install Rust 1.85+ (one line):  https://rustup.rs',
       '  curl --proto =https --tlsv1.2 -sSf https://sh.rustup.rs | sh',
       '',
       'then reinstall:  npm install @erebyx/sdk',

@@ -28,7 +28,7 @@ That's the whole loop: install -> save. Memory is encrypted in transit (TLS 1.3)
 
 ## What it is
 
-`@erebyx/sdk` is the Node.js / TypeScript client for the EREBYX memory substrate. It wraps the Rust [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk) crate via napi-rs — same circuit breaker, same wire protocol, same lifecycle hint surface, native performance.
+`@erebyx/sdk` is the Node.js / TypeScript client for the EREBYX memory substrate. It wraps the Rust [`erebyx-sdk`](https://github.com/ProjectEREBYX/erebyx-sdk) crate via napi-rs — same circuit breaker, same wire protocol, same lifecycle hint surface, native performance.
 
 It exposes the v0.1.1 cognitive surface as five async methods:
 
@@ -171,7 +171,7 @@ Stable `code` values: `AUTH`, `CIRCUIT_OPEN`, `RATE_LIMITED`, `NETWORK`, `SERVER
 
 v0.1.1 ships a prebuilt native binary for **macOS arm64 (Apple Silicon)**.
 Every other platform — macOS x64, Linux arm64, Linux x64, Windows x64 —
-builds from source on install (requires Rust 1.77+).
+builds from source on install (requires Rust 1.85+).
 
 Per-platform prebuilds land in v0.1.2 once the cross-compile CI is wired.
 If you don't have Rust installed, `rustup` is the one-line install:
@@ -192,20 +192,20 @@ npm install @erebyx/sdk@latest
 ## Build from source
 
 ```bash
-git clone https://github.com/ProjectErebyx/erebyx-sdk-node.git
+git clone https://github.com/ProjectEREBYX/erebyx-sdk-node.git
 cd erebyx-sdk-node
 npm install
 npm run build
 ```
 
-Requires Rust 1.77+ and Node.js 18+. The native build is driven by `napi build --platform --release`.
+Requires Rust 1.85+ and Node.js 18+. The native build is driven by `napi build --platform --release`.
 
 ---
 
 ## See also
 
-- [`erebyx-cli`](https://github.com/ProjectErebyx/erebyx-cli) — Native CLI for MCP integration
-- [`erebyx-sdk`](https://github.com/ProjectErebyx/erebyx-sdk) — Rust SDK (this package wraps it)
+- [`erebyx-cli`](https://github.com/ProjectEREBYX/erebyx-cli) — Native CLI for MCP integration
+- [`erebyx-sdk`](https://github.com/ProjectEREBYX/erebyx-sdk) — Rust SDK (this package wraps it)
 - [Substrate overview](https://erebyx.com/core)
 
 ---

@@ -491,8 +491,8 @@ pub struct JsSaveResult {
     /// `created_at`, `warnings`, `schema_version`,
     /// `consolidation_priority`, `content_hash`). The `enrichment`
     /// field replaced the legacy substrate-internal `atomization`
-    /// envelope at the API boundary per Genesis Arche brand canon —
-    /// same shape `{queued, queue_id}`, customer-facing key name.
+    /// envelope at the API boundary — same shape `{queued, queue_id}`,
+    /// customer-facing key name.
     pub extra: serde_json::Value,
 }
 
